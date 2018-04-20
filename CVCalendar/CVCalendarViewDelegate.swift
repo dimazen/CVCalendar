@@ -21,6 +21,8 @@ public protocol CVCalendarViewDelegate {
 
     @objc optional func shouldScrollOnOutDayViewSelection() -> Bool
     @objc optional func shouldAutoSelectDayOnWeekChange() -> Bool
+    @objc optional func preferredAutoSelectDateOnWeekChange(for suggestedDate: CVDate) -> CVDate?
+    
     @objc optional func shouldAutoSelectDayOnMonthChange() -> Bool
     @objc optional func shouldShowWeekdaysOut() -> Bool
     @objc optional func shouldSelectDayView(_ dayView: DayView) -> Bool

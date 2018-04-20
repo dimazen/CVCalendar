@@ -44,9 +44,18 @@ public final class CVCalendarWeekContentViewController: CVCalendarContentViewCon
             if self.matchedDays(dayView.date, CVDate(date: date, calendar: calendar)) {
                 self.insertWeekView(dayView.weekView, withIdentifier: self.presented)
                 self.calendarView.coordinator.flush()
+                
                 if self.calendarView.shouldAutoSelectDayOnWeekChange {
-                    self.calendarView.touchController.receiveTouchOnDayView(dayView)
-                    dayView.selectionView?.removeFromSuperview()
+                    if self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange != nil {
+                        if let selectionDate = self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange?(for: dayView.date) {
+                            let selectionDayView = dayView.weekView.dayViews.first { matchedDays($0.date, selectionDate) }
+                            self.calendarView.touchController.receiveTouchOnDayView(dayView)
+                            dayView.selectionView?.removeFromSuperview()
+                        }
+                    } else {
+                        self.calendarView.touchController.receiveTouchOnDayView(dayView)
+                        dayView.selectionView?.removeFromSuperview()
+                    }
                 }
             }
         }
@@ -443,14 +452,24 @@ extension CVCalendarWeekContentViewController {
                 if let selected = coordinator?.selectedDayView ,
                     !matchedWeeks(selected.date, presentedDate) &&
                         calendarView.shouldAutoSelectDayOnWeekChange {
-                    let current = CVDate(date: Foundation.Date(), calendar: calendar)
+                    
+                        var current = CVDate(date: Foundation.Date(), calendar: calendar)
 
-                            if matchedWeeks(current, presentedDate) {
-                                selectDayViewWithDay(current.day, inWeekView: presentedWeekView)
+                        if self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange != nil {
+                            let result = self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange?(for: current)
+                            if result == nil {
+                                return
                             } else {
-                                selectDayViewWithDay(presentedDate.day,
-                                                     inWeekView: presentedWeekView)
+                                current = result
                             }
+                        }
+                    
+                        if matchedWeeks(current, presentedDate) {
+                            selectDayViewWithDay(current.day, inWeekView: presentedWeekView)
+                        } else {
+                            selectDayViewWithDay(presentedDate.day,
+                                                 inWeekView: presentedWeekView)
+                        }
                 }
         }
     }
