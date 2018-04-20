@@ -456,11 +456,10 @@ extension CVCalendarWeekContentViewController {
                         var current = CVDate(date: Foundation.Date(), calendar: calendar)
 
                         if self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange != nil {
-                            let result = self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange?(for: current)
-                            if result == nil {
-                                return
-                            } else {
+                            if let result = self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange?(for: current) {
                                 current = result
+                            } else {
+                                return
                             }
                         }
                     
