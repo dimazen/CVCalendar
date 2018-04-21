@@ -47,10 +47,12 @@ public final class CVCalendarWeekContentViewController: CVCalendarContentViewCon
                 
                 if self.calendarView.shouldAutoSelectDayOnWeekChange {
                     if self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange != nil {
-                        if let selectionDate = self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange?(for: dayView.date) {
-                            let selectionDayView = dayView.weekView.dayViews.first { matchedDays($0.date, selectionDate) }
-                            self.calendarView.touchController.receiveTouchOnDayView(dayView)
-                            dayView.selectionView?.removeFromSuperview()
+                        if
+                            let selectionDate = self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange?(for: dayView.date),
+                            let selectionDayView = dayView.weekView.dayViews.first(where: { matchedDays($0.date, selectionDate) })
+                        {
+                            self.calendarView.touchController.receiveTouchOnDayView(selectionDayView)
+                            selectionDayView.selectionView?.removeFromSuperview()
                         }
                     } else {
                         self.calendarView.touchController.receiveTouchOnDayView(dayView)
@@ -467,7 +469,7 @@ extension CVCalendarWeekContentViewController {
                 
                 let today = CVDate(date: Foundation.Date(), calendar: calendar)
                 
-                if matchedWeeks(today, effectiveDate) {
+                if matchedWeeks(today, effectiveDate) && matchedDays(effectiveDate, presentedDate) {
                     selectDayViewWithDay(today.day, inWeekView: presentedWeekView)
                 } else {
                     selectDayViewWithDay(effectiveDate.day,
