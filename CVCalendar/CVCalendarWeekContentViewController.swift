@@ -436,40 +436,44 @@ extension CVCalendarWeekContentViewController {
         
         let calendar = self.calendarView.delegate?.calendar?() ?? Calendar.current
 
-        if let presentedWeekView = weekViews[presented],
-            let presentedMonthView = monthViews[presented] {
-                self.presentedMonthView = presentedMonthView
+        if
+            let presentedWeekView = weekViews[presented],
+            let presentedMonthView = monthViews[presented]
+        {
+            self.presentedMonthView = presentedMonthView
             calendarView.presentedDate = CVDate(date: presentedMonthView.date, calendar: calendar)
 
-                var presentedDate: CVDate!
-                for dayView in presentedWeekView.dayViews {
-                    if !dayView.isOut {
-                        presentedDate = dayView.date
-                        break
+            var presentedDate: CVDate!
+            for dayView in presentedWeekView.dayViews {
+                if !dayView.isOut {
+                    presentedDate = dayView.date
+                    break
+                }
+            }
+
+            if
+                let presentedDate = presentedDate,
+                let selected = coordinator?.selectedDayView ,
+                !matchedWeeks(selected.date, presentedDate) && calendarView.shouldAutoSelectDayOnWeekChange
+            {
+                var effectiveDate = presentedDate
+                if self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange != nil {
+                    if let result = self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange?(for: effectiveDate) {
+                        effectiveDate = result
+                    } else {
+                        return
                     }
                 }
-
-                if let selected = coordinator?.selectedDayView ,
-                    !matchedWeeks(selected.date, presentedDate) &&
-                        calendarView.shouldAutoSelectDayOnWeekChange {
-                    
-                        var current = CVDate(date: Foundation.Date(), calendar: calendar)
-
-                        if self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange != nil {
-                            if let result = self.calendarView.delegate?.preferredAutoSelectDateOnWeekChange?(for: current) {
-                                current = result
-                            } else {
-                                return
-                            }
-                        }
-                    
-                        if matchedWeeks(current, presentedDate) {
-                            selectDayViewWithDay(current.day, inWeekView: presentedWeekView)
-                        } else {
-                            selectDayViewWithDay(presentedDate.day,
-                                                 inWeekView: presentedWeekView)
-                        }
+                
+                let today = CVDate(date: Foundation.Date(), calendar: calendar)
+                
+                if matchedWeeks(today, effectiveDate) {
+                    selectDayViewWithDay(today.day, inWeekView: presentedWeekView)
+                } else {
+                    selectDayViewWithDay(effectiveDate.day,
+                                         inWeekView: presentedWeekView)
                 }
+            }
         }
     }
 
