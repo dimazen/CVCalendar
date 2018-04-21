@@ -42,14 +42,6 @@ public final class CVDate: NSObject {
 
         super.init()
     }
-    
-    public override var hashValue: Int {
-        return Hash.combineHashes(year.hashValue, month.hashValue, week.hashValue, day.hashValue)
-    }
-    
-    public static func == (lhs: CVDate, rhs: CVDate) -> Bool {
-        return lhs.year == rhs.year && lhs.month == rhs.month && lhs.week == rhs.week && lhs.day == rhs.day
-    }
 }
 
 extension CVDate {
