@@ -467,13 +467,8 @@ extension CVCalendarWeekContentViewController {
                     }
                 }
                 
-                let today = CVDate(date: Foundation.Date(), calendar: calendar)
-                
-                if matchedWeeks(today, effectiveDate) && matchedDays(effectiveDate, presentedDate) {
-                    selectDayViewWithDay(today.day, inWeekView: presentedWeekView)
-                } else {
-                    selectDayViewWithDay(effectiveDate.day,
-                                         inWeekView: presentedWeekView)
+                if matchedWeeks(effectiveDate, presentedDate) {
+                    selectDayViewWithDay(effectiveDate.day, inWeekView: presentedWeekView)
                 }
             }
         }
